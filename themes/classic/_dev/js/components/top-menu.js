@@ -39,7 +39,7 @@ export default class TopMenu extends DropDown {
         // eslint-disable-next-line
         const classesSelected = Array.prototype.slice
           .call(e.currentTarget.classList)
-          .map((elem) => (typeof elem === 'string' ? `.${elem}` : false));
+          .map(elem => (typeof elem === 'string' ? `.${elem}` : false));
 
         elmtClass = classesSelected.join('');
 

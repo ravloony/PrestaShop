@@ -24,81 +24,86 @@
  */
 const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+
+const cssLoaders = [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader'
+];
 
 let config = {
   entry: {
-    main: ['./js/theme.js', './css/theme.scss'],
+    main: [
+      './js/theme.js',
+      './css/theme.scss'
+    ]
   },
   output: {
     path: path.resolve(__dirname, '../assets/js'),
     filename: 'theme.js',
+    publicPath: ''
   },
   module: {
     rules: [
       {
         test: /\.js/,
-        loader: 'babel-loader',
+        loader: 'babel-loader'
       },
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-              },
-            },
-            'postcss-loader',
-            'sass-loader',
-          ],
-        }),
+        use: cssLoaders.concat([
+          'sass-loader'
+        ])
       },
       {
-        test: /.(png|woff(2)?|eot|otf|ttf|svg|gif)(\?[a-z0-9=\.]+)?$/,
+        test: /.(png|woff(2)?|eot|ttf|svg|otf)(\?[a-z0-9=\.]+)?$/,
         use: [
           {
             loader: 'file-loader',
             options: {
-              name: '../css/[hash].[ext]',
-            },
-          },
-        ],
+              name: '../css/[hash].[ext]'
+            }
+          }
+        ]
       },
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader', 'postcss-loader'],
-      },
-    ],
+        test : /\.css$/,
+        use: cssLoaders
+      }
+    ]
   },
   externals: {
     prestashop: 'prestashop',
     $: '$',
-    jquery: 'jQuery',
+    jquery: 'jQuery'
   },
-  plugins: [new ExtractTextPlugin(path.join('..', 'css', 'theme.css'))],
+  plugins: [
+    new MiniCssExtractPlugin({ filename: path.join('..', 'css', 'theme.css') })
+  ],
+  optimization: {
+    minimizer: [
+      new TerserPlugin()
+/*      new UglifyJsPlugin({
+        sourceMap: false,
+        uglifyOptions: {
+          compress: {
+            sequences: true,
+            conditionals: true,
+            booleans: true,
+            if_return: true,
+            join_vars: true,
+            drop_console: true
+          },
+          output: {
+            comments: false
+          },
+          minimize: true
+        }
+      })*/
+    ]
+  }
 };
-
-if (process.env.NODE_ENV === 'production') {
-  config.plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: false,
-      compress: {
-        sequences: true,
-        conditionals: true,
-        booleans: true,
-        if_return: true,
-        join_vars: true,
-        drop_console: true,
-      },
-      output: {
-        comments: false,
-      },
-      minimize: true,
-    })
-  );
-}
 
 module.exports = config;

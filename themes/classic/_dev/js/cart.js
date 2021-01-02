@@ -119,7 +119,7 @@ $(document).ready(() => {
     }
   };
 
-  const getTouchSpinInput = ($button) => $($button.parents('.bootstrap-touchspin').find('input'));
+  const getTouchSpinInput = $button => $($button.parents('.bootstrap-touchspin').find('input'));
 
   const handleCartAction = (event) => {
     event.preventDefault();
